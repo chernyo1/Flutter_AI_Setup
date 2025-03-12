@@ -1,62 +1,35 @@
-# ================================
-# ✅ One-Click Automatic Setup Script for Flutter AI Assistant
-# ================================
+Write-Host "🚀 Starting Full Automatic Setup... Please Wait..."
 
-Write-Host "🚀 Starting Full Automatic Setup... Please Wait..." -ForegroundColor Cyan
-
-# Step 1: Create Required Directories
-$tempPath = "$env:TEMP\AI_Assistant"
-$projectDir = "C:\Users\$env:UserName\Desktop\AI_Assistant"
-
-if (!(Test-Path $tempPath)) {
-    mkdir $tempPath -Force
-}
-if (!(Test-Path $projectDir)) {
-    mkdir $projectDir -Force
-}
-
-# Step 2: Clone AI Assistant Project from GitHub
-$repoUrl = "https://github.com/chernyo1/Flutter_AI_Setup.git"
-if (!(Test-Path "$projectDir\.git")) {
-    Write-Host "📥 Cloning AI Assistant Project..."
-    git clone $repoUrl $projectDir
+# Step 1: सही डायरेक्टरी में जाना
+$projectPath = "C:\Users\$env:UserName\Desktop\AI_Assistant"
+if (Test-Path $projectPath) {
+    Set-Location -Path $projectPath
 } else {
-    Write-Host "✅ AI Assistant Project already exists. Pulling latest updates..."
-    Set-Location -Path $projectDir
-    git pull
+    Write-Host "⚠️ Error: AI_Assistant फोल्डर नहीं मिला!"
+    exit
 }
 
-# Step 3: Install Flutter & Dependencies
+# Step 2: अपडेट चेक और डाउनलोड करना
+Write-Host "✅ AI Assistant Project already exists. Pulling latest updates..."
+git pull
+
+# Step 3: Flutter dependencies इंस्टॉल करना
 Write-Host "📦 Installing Flutter dependencies..."
-Set-Location -Path $projectDir
-flutter pub get
-
-# Step 4: Setup Firebase (if required)
-if (Test-Path "$projectDir/firebase_options.dart") {
-    Write-Host "⚡ Setting up Firebase..."
-    flutterfire configure
+if (Test-Path "pubspec.yaml") {
+    flutter pub get
+} else {
+    Write-Host "❌ Error: pubspec.yaml नहीं मिला। कृपया सही डायरेक्टरी में जाएं।"
+    exit
 }
 
-# Step 5: Build Flutter APK
+# Step 4: APK बिल्ड करना
 Write-Host "📱 Building Flutter APK..."
 flutter build apk
 
-# Step 6: Run Backend (If Python Server is Required)
-$backendPath = "$projectDir\backend"
-if (Test-Path "$backendPath\app.py") {
-    Write-Host "🚀 Starting Backend Server..."
-    Start-Process -NoNewWindow -FilePath "python" -ArgumentList "$backendPath\app.py"
-} else {
-    Write-Host "⚠️ Backend Not Found. Skipping..."
-}
-
-# Step 7: Provide Download Link for APK
-$apkPath = "$projectDir\build\app\outputs\flutter-apk\app-release.apk"
+# Step 5: APK का पाथ दिखाना
+$apkPath = "$projectPath\build\app\outputs\flutter-apk\app-release.apk"
 if (Test-Path $apkPath) {
-    Write-Host "✅ Setup Complete! Download your APK from the following path:" -ForegroundColor Green
-    Write-Host $apkPath -ForegroundColor Yellow
+    Write-Host "✅ APK तैयार है: $apkPath"
 } else {
-    Write-Host "❌ APK Build Failed! Please check errors." -ForegroundColor Red
+    Write-Host "❌ APK Build Failed! कृपया त्रुटि जांचें।"
 }
-
-Write-Host "🎉 Done! Enjoy your AI Assistant. 🚀"
